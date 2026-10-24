@@ -2,7 +2,7 @@ import requests
 
 def fetch_network_data():
     try:
-        response = requests.get('https://api.country.is/', timeout=5)
+        response = requests.get('https://api.country.is/?fields=city,continent,subdivision,postal,location,asn', timeout=5)
 
         if response.status_code == 200:
             return response.json()
@@ -15,5 +15,3 @@ def fetch_network_data():
         return {"error": "Connection timed out. The network is too slow."}
     except requests.exceptions.RequestException as e:
         return {"error": f"An unexpected error occurred: {e}"}
-
-print(fetch_network_data())
