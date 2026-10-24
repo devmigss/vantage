@@ -1,16 +1,19 @@
-# This is a sample Python script.
+import requests
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+def fetch_network_data():
+    try:
+        response = requests.get('https://api.country.is/', timeout=5)
 
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {"error": f"API Error: Status code {response.status_code}"}
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    except requests.exceptions.ConnectionError:
+        return {"error": "Network connection failed. Please check your internet."}
+    except requests.exceptions.Timeout:
+        return {"error": "Connection timed out. The network is too slow."}
+    except requests.exceptions.RequestException as e:
+        return {"error": f"An unexpected error occurred: {e}"}
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+print(fetch_network_data())
