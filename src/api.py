@@ -1,8 +1,15 @@
 import requests
 
-def fetch_network_data():
+def fetch_network_data(ip=None):
     try:
-        response = requests.get('https://api.country.is/?fields=city,continent,subdivision,postal,location,asn', timeout=5)
+        # 1. Format the URL based on whether an IP was provided
+        if ip:
+            url = f"https://api.country.is/{ip}?fields=city,continent,subdivision,postal,location,asn"
+        else:
+            url = "https://api.country.is/?fields=city,continent,subdivision,postal,location,asn"
+
+        # 2. Make the request
+        response = requests.get(url, timeout=5)
 
         if response.status_code == 200:
             return response.json()
