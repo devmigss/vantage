@@ -5,7 +5,6 @@ setup(
     version="1.0.0",
     description="Instant network data retrieval and geolocation CLI.",
     author="Your Name",
-    # Since your files are in the root directory, we list them as modules
     py_modules=["main", "api", "cli"],
     install_requires=[
         "requests>=2.25.1",
