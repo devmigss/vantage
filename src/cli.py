@@ -1,5 +1,4 @@
 import argparse
-import json
 import sys
 
 def parse_arguments():
@@ -12,8 +11,6 @@ def parse_arguments():
         description="Vantage: Instant network data retrieval and geolocation."
     )
 
-    # Adding an optional argument for a specific IP.
-    # If left blank, your API will likely check the user's current IP.
     parser.add_argument(
         "-i", "--ip",
         type=str,
@@ -25,16 +22,33 @@ def parse_arguments():
 
 
 def display_result(data: dict):
-    """
-    Formats and prints the successful API response as clean, readable JSON.
-    """
-    # The indent=4 ensures the terminal output is human-readable
-    formatted_json = json.dumps(data, indent=4)
-    print(formatted_json)
+    if "error" in data:
+        display_error(data["error"])
+        return
 
+    ip = data.get("ip") or "Unknown"
+    country = data.get("country") or "Unknown"
+    city = data.get("city") or "Unknown"
+    continent = data.get("continent") or "Unknown"
+    postal = data.get("postal") or "N/A"
+
+    asn = data.get("asn", {})
+    asn_name = asn.get("organization") or "Unknown"
+
+    location = data.get("location", {})
+    lat = location.get("latitude", "N/A")
+    lon = location.get("longitude", "N/A")
+
+    print("\n" + "=" * 45)
+    print(" 🌍  VANTAGE NETWORK INTELLIGENCE")
+    print("=" * 45)
+    print(f" 📡 IP Address  : {ip}")
+    print(f" 🗺️  Location    : {city}, {country} ({continent})")
+    print(f" 📮 Postal Code : {postal}")
+    print(f" 📍 Coordinates : {lat}, {lon}")
+    print(f" 🏢 ISP Provider    : {asn_name}")
+    print("=" * 45 + "\n")
 
 def display_error(error_message: str):
-    """
-    Handles terminal output for errors, sending them to standard error (stderr).
-    """
-    print(f"Vantage Error: {error_message}", file=sys.stderr)
+    print("\n❌ Vantage Error ❌")
+    print(f"{error_message}\n", file=sys.stderr)
