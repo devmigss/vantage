@@ -1,6 +1,7 @@
 import argparse
 import sys
 
+
 def parse_arguments():
     """
     Parses command-line arguments for the Vantage application.
@@ -8,20 +9,20 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(
         prog="vantage",
-        description="Vantage: Instant network data retrieval and geolocation."
+        description="Vantage: Instant network data retrieval, DNS resolution, and weather."
     )
 
     parser.add_argument(
         "-i", "--ip",
         type=str,
-        help="Target IP address to inspect. Leave blank to check your own network.",
+        help="Target IP address or domain name to inspect. Leave blank to check your own network.",
         default=None
     )
 
     return parser.parse_args()
 
 
-def display_result(data: dict):
+def display_result(data: dict, dns_hostname: str = None, weather: dict = None):
     if "error" in data:
         display_error(data["error"])
         return
@@ -39,15 +40,30 @@ def display_result(data: dict):
     lat = location.get("latitude", "N/A")
     lon = location.get("longitude", "N/A")
 
+    hostname_display = dns_hostname or "N/A"
+
+    if weather and "error" not in weather:
+        temp = weather.get("temperature", "N/A")
+        wind = weather.get("windspeed", "N/A")
+        condition = weather.get("condition", "Unknown")
+        weather_display = f"{temp}°C, {condition} (Wind: {wind} km/h)"
+    elif weather and "error" in weather:
+        weather_display = f"Unavailable ({weather['error']})"
+    else:
+        weather_display = "N/A"
+
     print("\n" + "=" * 45)
     print(" 🌍  VANTAGE NETWORK INTELLIGENCE")
     print("=" * 45)
     print(f" 📡 IP Address  : {ip}")
+    print(f" 🌐 Hostname    : {hostname_display}")
     print(f" 🗺️  Location    : {city}, {country} ({continent})")
     print(f" 📮 Postal Code : {postal}")
     print(f" 📍 Coordinates : {lat}, {lon}")
-    print(f" 🏢 ISP Provider    : {asn_name}")
+    print(f" 🏢 ISP Provider: {asn_name}")
+    print(f" 🌤️  Weather     : {weather_display}")
     print("=" * 45 + "\n")
+
 
 def display_error(error_message: str):
     print("\n❌ Vantage Error ❌")
