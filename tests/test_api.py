@@ -136,7 +136,7 @@ class TestMeasureLatency(unittest.TestCase):
         self.assertEqual(result["latency_ms"], 25.0)
         self.assertEqual(result["port"], 443)
 
-    @patch("api.time.perf_counter", side_effect=[2.000, 2.012])
+    @patch("api.time.perf_counter", side_effect=[1.000, 2.000, 2.012])
     @patch("api.socket.create_connection")
     def test_measure_latency_fallback_port(self, mock_conn, mock_timer):
         mock_ctx = Mock()
