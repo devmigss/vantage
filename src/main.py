@@ -5,6 +5,7 @@ from api import (
     reverse_dns_lookup,
     fetch_network_data,
     fetch_weather_data,
+    measure_latency,
 )
 
 
@@ -40,8 +41,16 @@ def main():
             location.get("longitude"),
         )
 
-        print("📊 6. Data received, sending to display...")
-        display_result(data, dns_hostname=hostname, weather=weather)
+        print("⚡ 6. Measuring network latency...")
+        latency = measure_latency(data.get("ip"))
+
+        print("📊 7. Data received, sending to display...")
+        display_result(
+            data,
+            dns_hostname=hostname,
+            weather=weather,
+            latency=latency,
+        )
 
     except Exception as e:
         display_error(str(e))

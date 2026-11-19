@@ -1,6 +1,11 @@
 import ipaddress
 import socket
+import time
 import requests
+import urllib3.util.connection as urllib3_cn
+
+# Prefer IPv4 so requests does not stall on unreachable IPv6 addresses
+urllib3_cn.allowed_gai_family = lambda: socket.AF_INET
 
 WEATHER_CODE_MAP = {                                                                                                
     0: "Clear sky",                                                                                                 
@@ -118,3 +123,29 @@ def fetch_weather_data(lat, lon):
         return {"error": "Weather lookup timed out."}                                                               
     except requests.exceptions.RequestException as e:                                                               
         return {"error": f"Weather lookup error: {e}"}
+
+
+
+def measure_latency(ip, ports=(443, 80, 53), timeout=5):
+    """
+    Measures TCP connection latency (in ms) to the target IP across common ports.
+    """
+    if not ip:
+        return {"error": "Target IP unavailable for latency test."}
+
+    last_error = "Connection failed"
+    for port in ports:
+        try:
+            start = time.perf_counter()
+            with socket.create_connection((ip, port), timeout=timeout):
+                elapsed_ms = (time.perf_counter() - start) * 1000
+            return {
+                "latency_ms": round(elapsed_ms, 2),
+                "port": port,
+            }
+        except socket.timeout:
+            last_error = "Connection timed out"
+        except OSError as e:
+            last_error = str(e) or "Connection refused"
+
+    return {"error": f"Latency test failed ({last_error})."}
