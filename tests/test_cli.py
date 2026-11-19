@@ -47,29 +47,47 @@ class TestCLI(unittest.TestCase):
         self.assertIn("8.8.8.8", output.getvalue())
         self.assertIn("Google LLC", output.getvalue())
 
-    def test_display_result_with_dns_and_weather(self):                                                                                 
-        data = {                                                                                                                        
-            "ip": "8.8.8.8",                                                                                                            
-            "country": "US",                                                                                                            
-            "city": "Mountain View",                                                                                                    
-            "continent": "NA",                                                                                                          
-            "postal": "94043",                                                                                                          
-            "asn": {"organization": "Google LLC"},                                                                                      
-            "location": {"latitude": 37.386, "longitude": -122.0838},                                                                   
-        }                                                                                                                               
-        weather = {                                                                                                                     
-            "temperature": 21.0,                                                                                                        
-            "windspeed": 8.5,                                                                                                           
-            "condition": "Clear sky",                                                                                                   
-        }                                                                                                                               
-                                                                                                                                            
-        output = StringIO()                                                                                                             
-        with redirect_stdout(output):                                                                                                   
-            display_result(data, dns_hostname="dns.google", weather=weather)                                                            
-                                                                                                                                            
-        result = output.getvalue()                                                                                                      
-        self.assertIn("dns.google", result)                                                                                             
+    def test_display_result_with_dns_and_weather(self):
+        data = {
+            "ip": "8.8.8.8",
+            "country": "US",
+            "city": "Mountain View",
+            "continent": "NA",
+            "postal": "94043",
+            "asn": {"organization": "Google LLC"},
+            "location": {"latitude": 37.386, "longitude": -122.0838},
+        }
+        weather = {
+            "temperature": 21.0,
+            "windspeed": 8.5,
+            "condition": "Clear sky",
+        }
+
+        output = StringIO()
+        with redirect_stdout(output):
+            display_result(data, dns_hostname="dns.google", weather=weather)
+
+        result = output.getvalue()
+        self.assertIn("dns.google", result)
         self.assertIn("21.0°C, Clear sky", result)
+
+    def test_display_result_with_latency(self):
+        data = {
+            "ip": "8.8.8.8",
+            "country": "US",
+            "city": "Mountain View",
+            "continent": "NA",
+            "postal": "94043",
+            "asn": {"organization": "Google LLC"},
+            "location": {"latitude": 37.386, "longitude": -122.0838},
+        }
+        latency = {"latency_ms": 14.5, "port": 443}
+
+        output = StringIO()
+        with redirect_stdout(output):
+            display_result(data, latency=latency)
+
+        self.assertIn("14.5 ms (TCP/443)", output.getvalue())
 
 
 if __name__ == "__main__":

@@ -22,7 +22,12 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def display_result(data: dict, dns_hostname: str = None, weather: dict = None):
+def display_result(
+    data: dict,
+    dns_hostname: str = None,
+    weather: dict = None,
+    latency: dict = None,
+):
     if "error" in data:
         display_error(data["error"])
         return
@@ -52,6 +57,13 @@ def display_result(data: dict, dns_hostname: str = None, weather: dict = None):
     else:
         weather_display = "N/A"
 
+    if latency and "error" not in latency:
+        latency_display = f"{latency.get('latency_ms', 'N/A')} ms (TCP/{latency.get('port', 'N/A')})"
+    elif latency and "error" in latency:
+        latency_display = f"Unavailable ({latency['error']})"
+    else:
+        latency_display = "N/A"
+
     print("\n" + "=" * 45)
     print(" 🌍  VANTAGE NETWORK INTELLIGENCE")
     print("=" * 45)
@@ -62,6 +74,7 @@ def display_result(data: dict, dns_hostname: str = None, weather: dict = None):
     print(f" 📍 Coordinates : {lat}, {lon}")
     print(f" 🏢 ISP Provider: {asn_name}")
     print(f" 🌤️  Weather     : {weather_display}")
+    print(f" ⚡ Latency     : {latency_display}")
     print("=" * 45 + "\n")
 
 
